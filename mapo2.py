@@ -22,8 +22,17 @@ Lllego = []
 Lpaso = []
 Lbrinco = []
 vtesoros=[(1,3),(3,2),(1,1)]
+vtesoros2=[]
+vtesoBonus=[(5,1),(4,3),(5,3)]
 vcvtesoros=['01gato79','02pollo22','03carro44']
+vcvteBonus=['01todos97','02todoenun98','03nombre99']
 vcamino=[]
+
+vsonclavemap=[1,2,3,4,5,6,7,8,9,10,11,12,13]
+vsonclavemap1=['A','J','Q','K',',','D']
+vsonclavemap1=vsonclavemap1+[i.lower() for i in vsonclavemap1]
+vsonclavemap2=[str(i) for i in vsonclavemap]
+vsonclavemap=vsonclavemap+vsonclavemap1+vsonclavemap2
 
 LtesAcum=['Ninguno']
 
@@ -92,6 +101,10 @@ def cuadricula(cam='loquito',x=TamanoTapete[0],y=TamanoTapete[1],aa=TamanoCuadro
         i=d[0]
         j=d[1]
         GRL[Dist(i,j)]='.'
+    for d in vtesoros2:
+        i=d[0]
+        j=d[1]
+        GRL[Dist(i,j)]='*'
 
     if cam != 'loquito':
         vcamino=cam
@@ -147,10 +160,13 @@ def cuadricula(cam='loquito',x=TamanoTapete[0],y=TamanoTapete[1],aa=TamanoCuadro
 
     info = ' nada mas'
 
-    for i in vtesoros:
+    for i in vtesoros+vtesoros2:
         if GRL[Dist(i)] in ('O','7','8','9','D','J','Q') or GRL[Dist(i)+2] == 'K':
             Lllego.append(i)
-            LtesAcum.append(vcvtesoros[vtesoros.index(i)]) if vcvtesoros[vtesoros.index(i)] not in LtesAcum else None
+            if i in vtesoros:
+                LtesAcum.append(vcvtesoros[vtesoros.index(i)]) if vcvtesoros[vtesoros.index(i)] not in LtesAcum else None
+            elif i in vtesoros2:
+                LtesAcum.append(vcvteBonus[vtesoBonus.index(i)]) if vcvteBonus[vtesoBonus.index(i)] not in LtesAcum else None
             if 'Ninguno' in LtesAcum:
                 LtesAcum.remove('Ninguno')
             huboencu=1
@@ -166,11 +182,19 @@ def cuadricula(cam='loquito',x=TamanoTapete[0],y=TamanoTapete[1],aa=TamanoCuadro
         print '\n--TE CAISTE--'
         info = '\n--TE CAISTE--'
 
+    if any(i not in vsonclavemap for i in vvcamino):
+        Lllego = []
+        Lpaso = []
+        Lbrinco = []
+        print '\n--Codigo invalido--'
+        info = '\n--Algo en tu codigo es invalido--'
+# todo si meten la clave de su nombre
     if len(Lllego)>0:
         print 'Agarraste Tesoros--> ',Lllego
         info = '\n--AGARRASTE TESOROS en--->>> ' + str(Lllego)+'\n--hay nuevos tesoros en tu maletin\n si quieres verlos escribe: mimaletin() --'
         if all(i in Lllego for i in vtesoros):
             info=info+'\n\n¡¡¡Premio adicional por\ntomar todos los tesoros en un solo recorrido!!!--'
+            sacobonus(2)
     info='\nRecorriste el tapete con la clave -'+ str(vcamino) +'- y'+ info
 
     if Vpresenta==1:
@@ -207,8 +231,10 @@ def entronombre(vv):
                 Nomv=i
     elif any(i not in reconocibles3 for i in vvv.split(' ')):
         Nomv='Foraneo'
-    elif any(i in ['Maria Jose','Maria','Jose'] for i in vvv.split(' ')):
+    elif any(i in ['Maria Jose','maria jose','Maria','maria','Jose'] for i in vvv.split(' ')):
         Nomv= 'Majo'
+    elif any(i in ['Yas','Yaz','Fer','Fernanda'] for i in vvv.split(' ')):
+        Nomv='Yazmin'
     try:
         luga=LAlumnos.index(Nomv)
     except:
@@ -226,11 +252,13 @@ def entronombre(vv):
         print('Te reconoci\n')
         medicen=raw_input(ALpersonal[luga]+'\n\n..(s/n)..>')
         if medicen in LRafirmacioes:
+
             if MCUP==1:
                 print ('\n¡Que Bueno jugar de nuevo contigo ' +Nomv+ '!\n'
                        'Supongo que la ves pasada que jugaste\n'
                        'lograste que te dibujara un mapa\n'
-                       'Para volvrte a abrir la puerta escribe una clave con comas')
+                       '¿Ya entiendes que hacen las claves de mapa?\n'
+                       'Para volverte a abrir la puerta escribe una clave de mapa con comas')
             else:
                 print('Que bueno '+ Nomv +' te has gando una pista\nSi conoces el codigo secreto\n'
                               'te puedo dibujar un mapa\n...')
@@ -280,7 +308,10 @@ def sumanombre(v,vvv=0):
         tuple = (str(sum(valaores)), str(valaores))
 
     if vvv!=0:
-        return sum(valaores)
+        if vvv==1:
+            return sum(valaores)
+        elif vvv==2:
+            return valaores
     else:
         return ('\n'+', '.join(desple)+'\n'+', '.join(desplee)+'\n'+'\nLa suma de todas las letras en\n'
                 '--" '+v+' "-- Es = '+tuple[0])
@@ -289,7 +320,10 @@ SN=sumanombre
 def enconteso(vv):
     print (AcciArt.gato2)
 # todo bonitas claves
-Lclavpresen=['UNA MERA CALAVE','DOS MERAS CLAVES','Tres MERAS CLAVES']
+Lclavpresen=['Muestrale el gato a Carlos\n','Muestrale el pollo a Carlos\n','Muestrale el carro a Carlos\n',
+             'bonus1','bonus2',
+             ('\nMustrale el dibujo a Carlos\n''--GANASTE UNA SUPER PISTA--\n\n''Yo puedo calcular la clave numerica de los nombres\n'
+              'solo escribe sumamombre(nombre) o SN(nombre)\n')]
 def mimaletin(vv=0):
     if vv==0:
         info='Los tesoros que haz recojido son:\n'
@@ -300,16 +334,21 @@ def mimaletin(vv=0):
     else:
         if vv in LtesAcum:
             arto = vv[2:-2]
-            arto2 = Lclavpresen[vcvtesoros.index(vv)]
+            arto2 = Lclavpresen[(vcvtesoros+vcvteBonus).index(vv)]
             try:
                 info = eval('AcciArt.'+arto)+'\n'+arto2
             except:
                 info = arto2
+        elif vv in vcvtesoros+vcvteBonus:
+            info='No seas copion. Tu no tienes ese tesoro'
         else:
-            info='No tienes ese tesoro'
+            info='Esa clave de tesoro es invalida'
 
-    return info
+    return info+'\n\nmaletin de '+str(TenemosNomConf)
 
+def sacobonus(vvv):
+    vtesoros2.append(vtesoBonus[vvv-1]) if vtesoBonus[vvv-1] not in vtesoros2 else None
+    print ('--Ganaste un premio especial--\nahora esta enterrado en tu mapa\nRvisa el mapa escribe 7,7')
 
 #----------terminan----- --------------  funciones del juago------------------------------------- termina
 
@@ -318,8 +357,11 @@ def mimaletin(vv=0):
 
 LAlumnos=['Alvaro','Majo','Dario','Alexis','Atreyu','Oscar','Yazmin','Foraneo']
 LAlumnosNM=[SN(i,1) for i in LAlumnos]
+LAlumnosNMU=[SN(i,2) for i in LAlumnos]
 LOPCIAlumnos=['Alvaro','Maria Jose','mari jo','maria','jose','Dario','Alexis','Atreyu','Oscar','Yazmin','yasmin',
                'Majo','Fernanda','Mixi','Maxi','Oskar','Albaro']
+LAluopciNM=[SN(i,1) for i in LOPCIAlumnos]
+LAluopciNMU=[SN(i,2) for i in LOPCIAlumnos]
 LAnimales=[['borrego cimarron', 'venado', 'obeja'],['guacamaya', 'lobo'],
          ['puma', 'tigre', 'lobo', 'chita'], ['leon', 'puma', 'tiburon', 'tigre'],
          ['megalodon', 'quetzalcoatl'],['serpientes', 'camaleon'],
@@ -422,10 +464,10 @@ LRcalculos=['suma','sumale','resta','restale','multiplica','multiplicalo',
 
 #-------inicia-------------------------------------------PROGRMA del JUEGO------------------------------inicia
 
-medijeronNC=[]
-medijeronNB=[]
+MemNombre=[]
+MemClave=[]
+MemDesco=[]
 medijeronNS=[]
-medijeronCV=[]
 
 medicen=''
 VNombre='desconocido'
@@ -478,7 +520,7 @@ while medicen != 'salexqu0':
             medicen = 'pasale'
             pass
     elif any(i in LRclaves for i in medicen.split(' ')):
-        medijeronCV.append(medicen)
+        MemClave.append(medicen)
 
         if medicen not in LRclaves:
             Lrecon=[]
@@ -514,22 +556,22 @@ while medicen != 'salexqu0':
             print('TU, COMO TE LLAMAS?\n')
 
             medicen=raw_input('..?..>')
-            medijeronNB.append(medicen)
-            VNombre = medijeronNB[-1]
+            MemNombre.append(medicen)
+            VNombre = MemNombre[-1]
             medicen = raw_input('Te entendi bien? Tu nombre es - "'+VNombre.upper()+'" -??\n..(s/n)..>')
 
             if medicen not in LRafirmacioes:
                 if medicen in LRnegaciones:
-                    medicen=raw_input('Ok, no entendi bien: Repitelo')
-                    medijeronNB.append(medicen)
-                    VNombre = medijeronNB[-1]
+                    medicen=raw_input('Ok, no entendi bien: Repitelo\nNombre..?..>')
+                    MemNombre.append(medicen)
+                    VNombre = MemNombre[-1]
                     medicen = raw_input('Te entendi bien? Tu nombre es - "' + VNombre.upper() + '" -??\n...>')
                     if medicen in LRafirmacioes:
                         print ('Hola '+ VNombre.upper())
                         entronombre(VNombre)
                 else:
-                    medijeronNB.append(medicen)
-                    VNombre = medijeronNB[-1]
+                    MemNombre.append(medicen)
+                    VNombre = MemNombre[-1]
                     medicen=raw_input('Tu nambres es -"'+VNombre.upper()+'"-??'+'\n...>')
                     if medicen in LRafirmacioes:
                         print ('Hola ' + VNombre.upper())
@@ -539,13 +581,14 @@ while medicen != 'salexqu0':
                 print ('Hola ' + VNombre.upper())
                 entronombre(VNombre)
         else:
-            print('\n\n Ya me entere que tu eres '+TenemosNomConf+' sabes jugar a los tesoros?' )
+            print('\n Ya me entere que tu eres '+TenemosNomConf+' sabes jugar a los tesoros?' )
+            medicen='pasale'
 
     if any(i in reconocibles3 for i in medicen.split(' ')):
         for i in medicen.split(' '):
             if i in reconocibles3:
-                medijeronNB.append(i)
-        VNombre = medijeronNB[-1]
+                MemNombre.append(i)
+        VNombre = MemNombre[-1]
         if TenemosNomConf == 0:
             medicen=raw_input('\n  " '+ VNombre.upper() + ' " Ese es tu nombre??\n\n...(s/n)...>')
         elif TenemosNomConf in [medicen,medicen.lower(),medicen.upper(),medicen.title()]:
@@ -580,7 +623,7 @@ while medicen != 'salexqu0':
     elif (medicen+'z')[0] in [str(i[0]) for i in TR]:
         try:
             propu=eval(letanu(medicen))
-            if type(propu)==tuple and propu[0] < 14 and propu[1] < 14:
+            if type(propu)==tuple and all(i<14 for i in propu):
                 propu=list(propu)
                 vcamino = medicen
                 print('MUY BIEN')
@@ -602,10 +645,41 @@ while medicen != 'salexqu0':
                         print('Tu habias escrito el CODIGO SECRETO -- '+str(propu)[1:-1]+' --\n'
                               'y como supsite que el - 8 - te hace avanzar 2 pasos\n'
                               'Ahora yo puedo hacer cosas mas DIVERTIDAS con los CODIGOS SECRETOS\n'
-                              '\n--SIGUE INVESTIGANDO--\n''escribe otro codgo y veras lo que pasa\n')
+                              '\n--SIGUE INVESTIGANDO--\n''escribe otro codigo de mapa y veras lo que pasa\n')
                         Vpresenta=0
                     else:
                         print('\nLo siento esa no es la carta\n')
+            elif type(propu) == tuple and list(propu) in LAluopciNMU:
+                print ('Esa lista de numeros es muy Muy especial\n'
+                       'son los numeros de las letras de un alumno de Experimentos tecnologicos\n')
+                if TenemosNomConf != 0:
+                    medicen = raw_input('\nEsribe la suma de las letras de ' + TenemosNomConf + '\n..?..>')
+                    try:
+                        medicen = eval(medicen)
+                    except:
+                        print('solo numeros')
+                    if medicen == SN(TenemosNomConf, 1):
+                        sacobonus(3)
+                    else:
+                        print ('sumaste mal')
+                else:
+                    medicen = raw_input('Para continuar tengo que saber quien eres escribe tu nombre\n..?..>')
+                    entronombre(medicen)
+                    medicen=TenemosNomConf
+                    if medicen > 3:
+                        medicen = raw_input('\nEsribe la suma de las letras de ' + medicen + '\n..?..>')
+                        try:
+                            medicen = eval(medicen)
+                        except:
+                            print('solo numeros')
+                        if medicen == SN(TenemosNomConf, 1):
+                            sacobonus(3)
+                        else:
+                            print ('sumaste mal')
+                    else:
+                        print('Algo salio mal mejor primero escribe tu nombre')
+                medicen = 'pasale'
+# todo algo mas especial por escribir clave
             elif type(propu) == int:
                 if propu in reconocibles:
                     print (LRPpistin[pistin%len(LRPpistin)][0]+str(propu)+LRPpistin[pistin%len(LRPpistin)][1])
@@ -665,6 +739,37 @@ while medicen != 'salexqu0':
                             print('Parece que te ecercas ese tambien es epecial')
                     elif ',' not in reconocibles1+reconocibles2:
                         print ('\nEse numero no me parece especial')
+                elif propu in LAluopciNM:
+                    print ('ESE NUMERO es muy Muy especial\n'
+                           'es la SUMA de las letras del nombre de un alumno de Experimentos tecnologicos\n')
+                    if TenemosNomConf != 0:
+                        medicen = raw_input('\nEsribe la suma de las letras de ' + TenemosNomConf+'\n\..?..>')
+                        try:
+                            medicen=eval(medicen)
+                        except:
+                            print('solo numeros')
+                        if medicen == SN(TenemosNomConf, 1):
+                            sacobonus(3)
+                        else:
+                            print ('sumaste mal')
+                    else:
+                        medicen = raw_input('Para continuar tengo que saber quien eres escribe tu nombre\n..?..>')
+                        entronombre(medicen)
+                        medicen = TenemosNomConf
+                        if medicen > 3:
+                            medicen = raw_input('\nEsribe la suma de las letras de ' + medicen+'\n..?..>')
+                            try:
+                                medicen = eval(medicen)
+                            except:
+                                print('solo numeros')
+                            if medicen == SN(TenemosNomConf, 1):
+                                sacobonus(3)
+                            else:
+                                print ('sumaste mal')
+                        else:
+                            print('Algo salio mal mejor primero escribe tu nombre')
+                    medicen = 'pasale'
+# todo algo mas especial por escribir clave
                 else:
                     medicen=raw_input('Eso es un numero. Yo soy buena con eso.\nQue hago con el '+medicen+' ??\n'+medicen+'...')
 
@@ -677,10 +782,12 @@ while medicen != 'salexqu0':
                                'Mi codigo para calcular numeros es que los escribas entre parentesis \n'
                                'Ejem...(2+2-3) o ...(2*5)')
                     except:
-                        print ('No pude. intenta hablarme en codigo')
+                        print ('No pude. intenta hablarme en codigo\n'
+                               'Mi codigo para calcular numeros es que los escribas entre parentesis\n'
+                               'Ejem...(2+2-3) o ...(2*5)')
 
                 elif medicen in ['abansa','avansa','avanza','abanza','jira','gira','salta','brinca']:
-                    print('Te acercas a descubrir el codigo que se hablar\n una pista \n-- utiliza comas --')
+                    print('Te acercas a descubrir el codigo de mapa que se hablar\n una pista \n-- utiliza comas --')
             else:
                 print ('Te acuerdas que te dije que Guardo un misterio\n a lo mejor tu lo conoces\n tiene que ver con numeros, cartas y mapas')
 
@@ -697,7 +804,7 @@ while medicen != 'salexqu0':
         pass
     else:
         PIST+=1
-        medijeronNC.append(medicen)
+        MemDesco.append(medicen)
         if len(medicen.split(' '))>1:
             print('\n'+LRPNocomprendo[PNC+1]+'--" '+medicen+' "--'+LRPNocomprendo2[PNC2+1])
         else:
